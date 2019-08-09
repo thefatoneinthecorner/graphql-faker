@@ -126,6 +126,9 @@ enum fake__Types {
   mimeType
   fileExtension
   semver
+
+  "Configure a list type"
+  list
 }
 
 enum fake__imageCategory {
@@ -192,6 +195,10 @@ input fake__options {
   maxNumber: Float
   "Only for type `number`"
   precisionNumber: Float
+  "Minimum list length"
+  minLength: Int
+  "Maximum list length"
+  maxLength: Int
 }
 
 directive @fake(type:fake__Types!, options: fake__options = {}, locale:fake__Locale) on FIELD_DEFINITION | SCALAR

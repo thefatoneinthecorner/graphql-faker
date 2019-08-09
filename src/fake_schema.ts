@@ -45,7 +45,7 @@ export function fakeSchema(schema: GraphQLSchema) {
       addFakeProperties(type);
     if (isAbstractType(type))
       type.resolveType = (obj => obj.__typename);
-  };
+  }
 
   function addFakeProperties(objectType:GraphQLObjectType) {
     const isMutation = (objectType === mutationType);
@@ -102,7 +102,7 @@ export function fakeSchema(schema: GraphQLSchema) {
     if (type instanceof GraphQLNonNull)
       return getResolver(type.ofType, field);
     if (type instanceof GraphQLList)
-      return arrayResolver(getResolver(type.ofType, field));
+      return arrayResolver(getResolver(type.ofType, field), getFakeDirectives(field));
 
     return fieldResolver(type, field);
   }
@@ -115,7 +115,7 @@ export function fakeSchema(schema: GraphQLSchema) {
 
     if (isLeafType(type)) {
       if (examples)
-        return () => getRandomItem(examples.values)
+        return () => getRandomItem(examples.values);
       if (fake) {
         return () => fakeValue(fake.type, fake.options, fake.locale);
       }
@@ -135,7 +135,7 @@ export function fakeSchema(schema: GraphQLSchema) {
   }
 
   function getFakeDirectives(object): DirectiveArgs {
-    const nodes = []
+    const nodes = [];
     if (object.astNode != null) {
       nodes.push(object.astNode);
     }
@@ -154,9 +154,10 @@ export function fakeSchema(schema: GraphQLSchema) {
   }
 }
 
-function arrayResolver(itemResolver) {
+function arrayResolver(itemResolver, fake) {
+  let options = fake && fake.fake && fake.fake.options ? fake.fake.options || {} : {};
   return (...args) => {
-    let length = getRandomInt(2, 4);
+    let length = getRandomInt(options.minLength || 2, options.maxLength || 4);
     const result = [];
 
     while (length-- !== 0)
